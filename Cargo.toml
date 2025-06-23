@@ -1,0 +1,7 @@
+[package]
+name = "integer_mate"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+vstd = { path = "../verus/source/vstd"}
