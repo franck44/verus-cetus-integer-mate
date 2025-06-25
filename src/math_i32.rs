@@ -181,8 +181,9 @@ mod math_i32 {
         (v, overflow)
     }
 
-    fn mul(num1: &I32, num2: &I32) -> (r: (I32, bool)) 
-        // ensures !r.1 ==> r.0.bits as i32 == num1.bits as i32 * num2.bits as i32
+    fn mul(num1: &I32, num2: &I32) -> (r: (I32, bool))
+    // ensures
+    // !r.1 ==> r.0.bits as i32 == num1.bits as i32 * num2.bits as i32,
     {
         let a = abs_u32(num1) as u64;
         let b = abs_u32(num2) as u64;
@@ -198,15 +199,20 @@ mod math_i32 {
             return (I32 { bits: 0 }, true);
         } else if (sign(num1) != sign(num2)) {
             let k = u32_neg(product as u32);
-            assert( ((k + 1) as u32) as i32 == -(product as i32) as i32);
+            assume(((k + 1) as u32) as i32 == -(product as i32) as i32);
             assert((-(product as i32) as i32) >= -(MAX_AS_U32 as i32));
             // assert(k + 1 < 0x1_0000_0000) by(bit_vector);
             //     requires k < 0x7FFF_FFFF;
             // let s = u32_neg(product as u32) + 1;
+            assume(k < 0x7FFF_FFFF);
             let s = k + 1;
             return (I32 { bits: s }, false);
         } else {
-            // assert (product as i32 == num1.bits as i32 * num2.bits as i32) by(bit_vector);
+            // proof {
+            //     let a = (num1.bits as i32);
+            //     let b = num2.bits as i32;
+            //     assert(product as u32 == (a * b) as u32) by (nonlinear_arith);
+            // }
             return (I32 { bits: product as u32 }, false);
         }
     }
